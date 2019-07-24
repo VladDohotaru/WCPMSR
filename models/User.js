@@ -7,28 +7,32 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true }
 });
 
-UserSchema.pre('save', async next => {
-  try {
-    // Check if document is new or a new password has been set
-    if (this.isNew || this.isModified('password')) {
-      // Saving reference to this because of changing scopes
-      const document = this;
-      const hashedPassword = await bcrypt.hash(document.password, saltRounds);
-      document.password = hashedPassword;
-      next();
-    } else {
-      next();
-    }
-  } catch (error) {
-    next(error)
-  }
 
+UserSchema.pre('save', function(next) {
+  // Check if document is new or a new password has been set
+  if (this.isNew || this.isModified('password')) {
+    // Saving reference to this because of changing scopes
+    const document = this;
+    bcrypt.hash(document.password, saltRounds,
+      function(err, hashedPassword) {
+      if (err) {
+        next(err);
+      }
+      else {
+        document.password = hashedPassword;
+        next();
+      }
+    });
+  } else {
+    next();
+  }
 });
 
 
 UserSchema.methods.isCorrectPassword = async function(password){
   try {
-    console.log(this.password)
+    console.log("PArola Criptata?", this.password)
+    console.log("PArola din request?", password)
     const same = await bcrypt.compare(password, this.password)
     return Promise.resolve(same);
   } catch (e) {

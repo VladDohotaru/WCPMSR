@@ -36,6 +36,7 @@ app.post('/api/register', function(req, res) {
   const user = new User({ email, password });
   user.save(function(err) {
     if (err) {
+      console.log(err)
       res.status(500)
         .send("Error registering new user please try again.");
     } else {
@@ -72,7 +73,7 @@ app.post('/api/authenticate', async (req, res) => {
 
 app.get('/checkToken', withAuth, function(req, res) {
   res.sendStatus(200);
-}
+})
 
 
 app.listen(process.env.PORT || 8080);

@@ -1,3 +1,14 @@
+
+## Instructiuni instalare proiect
+1. git clone git@github.com:VladDohotaru/WCPMSR.git
+2. cd WCPMSR
+3. npm install
+4. node server.js
+5. in alt tab dai comanda npm start
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -66,3 +77,5 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+

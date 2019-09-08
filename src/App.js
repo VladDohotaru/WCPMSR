@@ -4,6 +4,9 @@ import Home from './components/Home';
 import Secret from './components/Secret';
 import Login from './components/Login';
 
+import Admin from "layouts/Admin.js";
+import RTL from "layouts/RTL.js";
+
 export default class App extends Component {
   render() {
   return (
@@ -19,9 +22,12 @@ export default class App extends Component {
         </ul>
 
         <Switch>
-          <Route path="/" exact component={Home} />
-          <Route path="/secret" component={Secret} />
-          <Route path="/login" component={Login} />
+            <Route path="/admin" component={Admin} />
+            <Route path="/rtl" component={RTL} />
+            <Route path="/" exact component={Home} />
+            <Route path="/secret" component={Secret} />
+            <Route path="/login" component={Login} />
+            <Redirect from="/" to="/admin/dashboard" />
         </Switch>
       </div>
     </Router>

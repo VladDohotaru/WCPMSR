@@ -8,13 +8,14 @@ const withAuth = async (req, res, next) => {
     req.query.token ||
     req.headers['x-access-token'] ||
     req.cookies.token;
+    console.log('TOKEN:', token);
   if (!token) {
     res.status(401).send('Unauthorized: No token provided');
   } else {
       try {
         const decoded = await jwt.verify(token, secret);
         req.email = decoded.email;
-        next()
+        next();
       } catch (error) {
         res.status(401).send('Unauthorized: Invalid token');
       }

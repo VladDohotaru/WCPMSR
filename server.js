@@ -23,7 +23,7 @@ mongoose.connect(mongo_uri, function(err) {
   }
 });
 
-app.get('/api/home', function(req, res) {
+app.get('/admin/dashboard', withAuth, function(req, res) {
   res.send('Welcome!');
 });
 

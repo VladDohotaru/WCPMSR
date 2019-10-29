@@ -1,79 +1,30 @@
+'use strict';
+
+require('dotenv').config()
 const express = require('express');
-const bodyParser = require('body-parser')
-const path = require('path');
+const passportJWT = require('passport-jwt');;
+let ExtractJwt = passportJWT.ExtractJwt;
+let jwtOptions = {};
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+jwtOptions.secretOrKey = process.env.JWT_SECRET;
+const bodyParser = require('body-parser');
+const passport = require('./config/passport');
+const cookieParser = require('cookie-parser')
 const app = express();
-const mongoose = require('mongoose');
-const User = require('./models/User.js');
-const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
-const withAuth = require('./middleware');
+const router = express.Router();
 
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
-app.use(express.static(path.join(__dirname, 'build')));
-app.use(cookieParser());
-const secret = 'mysecretsshhh';
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
+app.use(express.static(__dirname + '/public'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/public/html');
+app.use(passport.initialize());
+app.use(router);
 
-const mongo_uri = 'mongodb://localhost/react-auth';
-mongoose.connect(mongo_uri, function(err) {
-  if (err) {
-    throw err;
-  } else {
-    console.log(`Successfully connected to ${mongo_uri}`);
-  }
+require('./routes/index.js')( router, passport);
+
+app.listen(process.env.SERVER_PORT, function() {
+  console.log(`Express is running on port ${process.env.SERVER_PORT}`);
 });
-
-app.get('/admin/dashboard', withAuth, function(req, res) {
-  res.send('Welcome!');
-});
-
-app.get('/api/secret', withAuth, function(req, res) {
-  res.send('The password is potato');
-});
-// POST route to register a user
-app.post('/api/register', function(req, res) {
-  const { email, password } = req.body;
-  const user = new User({ email, password });
-  user.save(function(err) {
-    if (err) {
-      console.log(err)
-      res.status(500)
-        .send("Error registering new user please try again.");
-    } else {
-      res.status(200).send("Welcome to the club!");
-    }
-  });
-});
-
-
-app.post('/api/authenticate', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (await user.isCorrectPassword(password)) {
-      const payload = { email };
-      const token = jwt.sign(payload, secret, {
-        expiresIn: '1h'
-      });
-      res.cookie('token', token, { httpOnly: true })
-        .sendStatus(200);
-    } else {
-      res.status(401)
-      .json({
-        error: 'Incorrect email or password'
-      });
-    }
-  } catch (err) {
-    res.status(500)
-      .json({
-      error: 'Internal error please try again'
-    });
-  }
-});
-
-app.get('/checkToken', withAuth, function(req, res) {
-  res.sendStatus(200);
-})
-
-
-app.listen(process.env.PORT || 8080);

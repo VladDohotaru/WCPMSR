@@ -22,7 +22,7 @@ const requireLogin = require('../middlewares/requireLogin');
 
 
 module.exports = (router, passport) => {
-	router.get('/', requireLogin, function(req, res) {
+	router.get('/', requireLogin, (req, res) => {
 		res.render('index.html')
 	});
 		
@@ -32,20 +32,20 @@ module.exports = (router, passport) => {
 		res.json({ AccountAdmin, msg: 'Account Admin created successfully' });	
 	});
 		
-	router.get('/login', async (req, res) => {
+	router.get('/login', (req, res) => {
 		res.render('login.html');
 	});
 		
-	router.get('/register', async (req, res) => {
+	router.get('/register', (req, res) => {
 		res.render('register.html');
 	});
 		
-	router.post('/login',  async function(req, res) {
+	router.post('/login', async (req, res) => {
 		const { username, password } = req.body;
 		if (username && password) {
       let AccountAdmin = await getAccountAdmin({ username: username });
 			if (!AccountAdmin) {
-				res.status(401).json({ message: 'No such Account Admin found' });
+				res.status(401).redirect('/login', { message: 'No such Account Admin found' });
 			}
 			if (false === passwordCheck(password, AccountAdmin.password)) {
 				res.status(401).json({ msg: 'Password is incorrect' });
@@ -62,7 +62,7 @@ module.exports = (router, passport) => {
 	});
 
 
-	router.get('/users', function(req, res) {
+	router.get('/users', (req, res) => {
 		res.render('users.html');
 	});
 }
